@@ -43,29 +43,19 @@ func insertMetadataArgs(args []string) []string {
 }
 
 // GetThumbnail extracts a JPEG thumbnail from a video at the given timestamp (in seconds).
-func GetThumbnail(videoPath string, timestamp int) (string, error) {
-	tmpFile, err := os.CreateTemp("", "thumb-*.jpeg")
-	if err != nil {
-		return "", fmt.Errorf("create temp thumbnail file: %w", err)
-	}
-	if err := tmpFile.Close(); err != nil {
-		return "", fmt.Errorf("close temp thumbnail file: %w", err)
-	}
-
-	outPath := tmpFile.Name()
-
+func GetThumbnail(videoPath string, timestamp int, outFile string) (string, error) {
 	args := []string{
 		"-ss", fmt.Sprintf("%d", timestamp),
 		"-i", videoPath,
 		"-vframes", "1",
-		outPath,
+		outFile,
 	}
 
 	if _, err := execFFmpeg(args...); err != nil {
 		return "", fmt.Errorf("extract thumbnail from %q at %ds: %w", videoPath, timestamp, err)
 	}
 
-	return outPath, nil
+	return outFile, nil
 }
 
 // HasEmbeddedSubs checks if a video file has embedded subtitles.
@@ -157,8 +147,22 @@ func FFprocess(source string, dest string, options AdvancedOpts) error {
 	if hasSubs {
 		args = append(args, "-metadata:s:s:0", "language=en")
 	}
+	tmpFile, err := os.CreateTemp("", "thumb-*.jpeg")
+	if err != nil {
+		return fmt.Errorf("create temp thumbnail file: %w", err)
+	}
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("close temp thumbnail file: %w", err)
+	}
+	
+	defer func(name string) {
+		err := os.Remove(name)
+		if err != nil {
+			fmt.Println("temp thumbnail remove error:", err)
+		}
+	}(tmpFile.Name())
 
-	thumbnail, err := GetThumbnail(source, options.ThumbnailTS)
+	thumbnail, err := GetThumbnail(source, options.ThumbnailTS, tmpFile.Name())
 	if err != nil {
 		return fmt.Errorf("generate thumbnail for %q: %w", source, err)
 	}
