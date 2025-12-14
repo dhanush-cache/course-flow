@@ -56,7 +56,7 @@ func extractFile(f *zip.File, dest string) error {
 }
 
 // Unzip extracts a zip archive to the specified destination folder
-func Unzip(src string, dest string) error {
+func Unzip(src string, dest string, onExtractFile ProgressCallback) error {
 	r, err := zip.OpenReader(src)
 	if err != nil {
 		return err
@@ -67,11 +67,13 @@ func Unzip(src string, dest string) error {
 		}
 	}(r)
 
-	for _, f := range r.File {
+	n := len(r.File)
+	for i, f := range r.File {
 		err = extractFile(f, dest)
 		if err != nil {
 			return err
 		}
+		onExtractFile(i+1, n, f.Name)
 	}
 	return nil
 }

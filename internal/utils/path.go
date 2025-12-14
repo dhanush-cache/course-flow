@@ -69,8 +69,29 @@ func CountVideos(source string) (int, error) {
 	return count, nil
 }
 
+func ProcessVideos(source string, targets []string, fn ProgressCallback) error {
+	paths, err := readDirNatSort(source)
+	if err != nil {
+		return err
+	}
+	if len(paths) != len(targets) {
+		return fmt.Errorf("expected %d targets, got %d", len(paths), len(targets))
+	}
+	for i := range len(targets) {
+		err := FFprocess(paths[i], targets[i], AdvancedOpts{10, ""})
+		if err != nil {
+			fmt.Printf("failed to process %s: %v\n", paths[i], err)
+		}
+		fn(i+1, len(targets), targets[i])
+	}
+	return nil
+}
+
 func MoveVideos(source string, targets []string) error {
-	paths, _ := readDirNatSort(source)
+	paths, err := readDirNatSort(source)
+	if err != nil {
+		return err
+	}
 	if len(paths) != len(targets) {
 		return fmt.Errorf("expected %d targets, got %d", len(paths), len(targets))
 	}
