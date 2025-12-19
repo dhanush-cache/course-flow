@@ -165,3 +165,21 @@ func videoFilter(path string) bool {
 	_, ok := videoExts[ext]
 	return ok
 }
+
+func CleanPath(path string) string {
+	replacer := strings.NewReplacer(
+		"?", "",
+		"*", "",
+		":", " -",
+		`"`, "'",
+		"<", "",
+		">", "",
+		"|", "-",
+		"\\", "",
+		"\t", " ",
+		"\n", " ",
+		"\r", " ",
+	)
+	cleaned := replacer.Replace(path)
+	return filepath.Clean(cleaned)
+}
