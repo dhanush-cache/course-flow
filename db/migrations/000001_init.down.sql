@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS course_urls;
+DROP TABLE IF EXISTS courses;
+DROP TABLE IF EXISTS timestamps;
