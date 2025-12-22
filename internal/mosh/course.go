@@ -12,9 +12,11 @@ import (
 	"github.com/dhanush-cache/course-flow/internal/utils"
 )
 
+// TODO: Improve the config management in this module
+
 // GetData fetches course data for the given slug.
-func GetData(slug string) (*Course, error) {
-	token, err := TokenCache(GetToken, "token")()
+func GetData(slug string, cfg *config.Config) (*Course, error) {
+	token, err := TokenCache(GetToken, "token", cfg)()
 	if err != nil {
 		return nil, fmt.Errorf("error getting token: %v", err)
 	}
@@ -60,14 +62,14 @@ func GetData(slug string) (*Course, error) {
 		for _, id := range course.BundleContents {
 			idMap[id] = struct{}{}
 		}
-		courses, err := CoursesCache(GetCourses, "courses")()
+		courses, err := CoursesCache(GetCourses, "courses", cfg)(cfg)
 		if err != nil {
 			return nil, err
 		}
 		for _, c := range *courses {
 			if _, exists := idMap[c.ID]; exists {
 				fmt.Println(c.Name)
-				childCourse, err := CourseCache(GetData)(c.Slug)
+				childCourse, err := CourseCache(GetData, cfg)(c.Slug, cfg)
 				if err != nil {
 					return nil, err
 				}
@@ -80,8 +82,8 @@ func GetData(slug string) (*Course, error) {
 }
 
 // GetCourses fetches the list of all courses.
-func GetCourses() (*[]Course, error) {
-	token, err := TokenCache(GetToken, "token")()
+func GetCourses(cfg *config.Config) (*[]Course, error) {
+	token, err := TokenCache(GetToken, "token", cfg)()
 	if err != nil {
 		return nil, fmt.Errorf("error getting token: %v", err)
 	}
@@ -131,20 +133,16 @@ type ParentInfo struct {
 }
 
 // GetFileNames retrieves file names for the given course.
-func GetFileNames(course *Course) ([]string, error) {
-	return doGetFileNames(course, nil)
+func GetFileNames(course *Course, cfg *config.Config) ([]string, error) {
+	return doGetFileNames(course, nil, cfg)
 }
 
 // doGetFileNames recursively retrieves file names for the given course.
-func doGetFileNames(course *Course, parent *ParentInfo) ([]string, error) {
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		return nil, err
-	}
+func doGetFileNames(course *Course, parent *ParentInfo, cfg *config.Config) ([]string, error) {
 	if course.Type == "bundle" {
 		var result []string
 		for i, childCourse := range course.Courses {
-			filenames, err := doGetFileNames(childCourse, &ParentInfo{course.Name, i + 1})
+			filenames, err := doGetFileNames(childCourse, &ParentInfo{course.Name, i + 1}, cfg)
 			if err != nil {
 				return nil, err
 			}

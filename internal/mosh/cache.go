@@ -12,12 +12,12 @@ import (
 
 type TokenFetchFunc func() (*Token, error)
 
-type CourseFetchFunc func(slug string) (*Course, error)
+type CourseFetchFunc func(slug string, cfg *config.Config) (*Course, error)
 
-type CoursesFetchFunc func() (*[]Course, error)
+type CoursesFetchFunc func(cfg *config.Config) (*[]Course, error)
 
 // TokenCache caches the result of a TokenFetchFunc based on the provided key.
-func TokenCache(fn TokenFetchFunc, key string) TokenFetchFunc {
+func TokenCache(fn TokenFetchFunc, key string, cfg *config.Config) TokenFetchFunc {
 	return func() (*Token, error) {
 		return cacheResult(
 			key,
@@ -25,32 +25,35 @@ func TokenCache(fn TokenFetchFunc, key string) TokenFetchFunc {
 			func(t *Token) bool {
 				return t.ExpiresAt.After(time.Now())
 			},
+			cfg,
 		)
 	}
 }
 
 // CourseCache caches the result of a CourseFetchFunc based on the course slug.
-func CourseCache(fn CourseFetchFunc) CourseFetchFunc {
-	return func(slug string) (*Course, error) {
+func CourseCache(fn CourseFetchFunc, cfg *config.Config) CourseFetchFunc {
+	return func(slug string, cfg *config.Config) (*Course, error) {
 		return cacheResult(
 			slug,
 			func() (*Course, error) {
-				return fn(slug)
+				return fn(slug, cfg)
 			},
 			nil,
+			cfg,
 		)
 	}
 }
 
 // CoursesCache caches the result of a CoursesFetchFunc based on the provided key.
-func CoursesCache(fn CoursesFetchFunc, key string) CoursesFetchFunc {
-	return func() (*[]Course, error) {
+func CoursesCache(fn CoursesFetchFunc, key string, cfg *config.Config) CoursesFetchFunc {
+	return func(cfg *config.Config) (*[]Course, error) {
 		return cacheResult(
 			key,
 			func() (*[]Course, error) {
-				return fn()
+				return fn(cfg)
 			},
 			nil,
+			cfg,
 		)
 	}
 }
@@ -60,12 +63,8 @@ func cacheResult[T any](
 	cacheKey string,
 	fetch func() (*T, error),
 	isValid func(*T) bool,
+	cfg *config.Config,
 ) (*T, error) {
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		return nil, err
-	}
-
 	cacheFile := filepath.Join(cfg.CacheDir, cacheKey+".json")
 
 	if data, err := os.ReadFile(cacheFile); err == nil {
