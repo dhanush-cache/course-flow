@@ -9,6 +9,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	CodeWithMosh = "codewithmosh"
+)
+
 type Config struct {
 	HomeDir     string
 	CoursesDir  string

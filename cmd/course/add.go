@@ -5,7 +5,10 @@ Copyright © 2025 Dhanush Shetty dhanushshettycache@outlook.com
 package course
 
 import (
+	"log"
+
 	config "github.com/dhanush-cache/course-flow/internal"
+	"github.com/dhanush-cache/course-flow/internal/service"
 	"github.com/spf13/cobra"
 )
 
@@ -18,9 +21,10 @@ func NewAddCommand(cfg *config.Config) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			key := args[0]
 			files, _ := cmd.Flags().GetStringSlice("files")
-			_ = key
-			_ = files
-			_ = cfg
+			err := service.AddCourse(key, files, cfg)
+			if err != nil {
+				log.Fatalf("Error adding course: %v", err)
+			}
 		},
 	}
 
