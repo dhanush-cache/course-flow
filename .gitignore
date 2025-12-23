@@ -2,3 +2,6 @@
 tmp/
 db.sqlite
 .env
+
+# TODO: Include cache in source control after adding dedicated services to manage them
+data/cache/
