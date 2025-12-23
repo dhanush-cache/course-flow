@@ -8,13 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listCmd = &cobra.Command{
-	Use:     "list",
-	Short:   "Lists the existing courses in the collection",
-	Aliases: []string{"ls"},
-	Run: func(cmd *cobra.Command, args []string) {
-	},
-}
-
-func init() {
+func NewListCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:     "list",
+		Short:   "Lists the existing courses in the collection",
+		Aliases: []string{"ls"},
+		Run: func(cmd *cobra.Command, args []string) {
+		},
+	}
 }
