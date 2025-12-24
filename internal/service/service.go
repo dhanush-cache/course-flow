@@ -8,8 +8,17 @@ import (
 	config "github.com/dhanush-cache/course-flow/internal"
 	"github.com/dhanush-cache/course-flow/internal/adapters"
 	"github.com/dhanush-cache/course-flow/internal/utils"
+	"github.com/fatih/color"
 	"github.com/vbauerster/mpb/v8"
 	"github.com/vbauerster/mpb/v8/decor"
+)
+
+var (
+	labelColor   = color.New(color.FgCyan, color.Bold)
+	counterColor = color.New(color.FgGreen)
+	etaColor     = color.New(color.FgYellow)
+	percentColor = color.New(color.FgMagenta, color.Bold)
+	doneColor    = color.New(color.FgGreen, color.Bold)
 )
 
 // TODO: Understand the bars better and refactor the code to make it cleaner.
@@ -71,11 +80,11 @@ func getExtractBar() *mpb.Bar {
 	return p.AddBar(0,
 		mpb.BarRemoveOnComplete(),
 		mpb.PrependDecorators(
-			decor.Name("Extracting", decor.WC{C: decor.DindentRight | decor.DextraSpace}),
-			decor.CountersNoUnit("%d / %d", decor.WCSyncWidth),
+			decor.Name(labelColor.Sprint("Extracting"), decor.WC{C: decor.DindentRight | decor.DextraSpace}),
+			decor.CountersNoUnit(counterColor.Sprint("%d / %d"), decor.WCSyncWidth),
 		),
 		mpb.AppendDecorators(
-			decor.OnComplete(decor.Percentage(decor.WC{W: 5}), "done"),
+			decor.OnComplete(decor.Percentage(decor.WC{W: 5}), doneColor.Sprint("done")),
 		),
 	)
 }
@@ -86,12 +95,12 @@ func getProcessBar(line *string, ch chan any) *mpb.Bar {
 		mpb.BarNoPop(),
 		mpb.PrependDecorators(
 			adapters.Line(func(statistics decor.Statistics) string { return *line }),
-			decor.Name("Processing", decor.WC{C: decor.DindentRight | decor.DextraSpace}),
-			decor.CountersNoUnit("%d / %d", decor.WCSyncWidth),
-			decor.OnComplete(decor.AverageETA(decor.ET_STYLE_GO, decor.WCSyncWidth), ""),
+			decor.Name(labelColor.Sprint("Processing"), decor.WC{C: decor.DextraSpace | decor.DindentRight}),
+			decor.CountersNoUnit(counterColor.Sprint("%d/%d"), decor.WC{C: decor.DextraSpace | decor.DindentRight}),
+			decor.OnComplete(decor.AverageETA(decor.ET_STYLE_MMSS, decor.WC{C: decor.DindentRight}), ""),
 		),
 		mpb.AppendDecorators(
-			decor.OnComplete(decor.Percentage(decor.WC{W: 5}), "done"),
+			decor.OnComplete(decor.Percentage(decor.WC{W: 5}), doneColor.Sprint("done")),
 		),
 	)
 }
