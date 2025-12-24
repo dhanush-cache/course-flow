@@ -2,9 +2,8 @@ package service
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"path/filepath"
+	"strings"
 
 	config "github.com/dhanush-cache/course-flow/internal"
 	"github.com/dhanush-cache/course-flow/internal/adapters"
@@ -15,8 +14,11 @@ import (
 
 // TODO: Understand the bars better and refactor the code to make it cleaner.
 
-func Process(zipFiles []string, targets []string) error {
+func Process(zipFiles []string, targets []string, cfg *config.Config) error {
 	var line string
+	lines := utils.BuildTree(targets)
+	lineIndex := 0
+
 	tempDir, err := os.MkdirTemp("", "zip-extract-*")
 	if err != nil {
 		return err
@@ -26,6 +28,7 @@ func Process(zipFiles []string, targets []string) error {
 			fmt.Println("failed to remove tempDir:", err)
 		}
 	}()
+
 	for _, zip := range zipFiles {
 		extractBar := getExtractBar()
 		err = utils.Unzip(zip, tempDir, func(done, total int, _ string) {
@@ -36,17 +39,25 @@ func Process(zipFiles []string, targets []string) error {
 			return err
 		}
 	}
-	ch := make(chan any)
 
+	ch := make(chan any)
 	processBar := getProcessBar(&line, ch)
 
-	err = utils.ProcessVideos(tempDir, targets, func(done, total int, current string) {
+	err = utils.ProcessVideos(tempDir, targets, cfg, func(done, total int, current string) {
 		processBar.SetTotal(int64(total), total == done)
 		processBar.SetCurrent(int64(done))
-		line, err = GenerateLineText(current)
-		if err != nil {
-			line = ""
+		var b strings.Builder
+		for {
+			s := lines[lineIndex]
+			b.WriteString(s)
+			lineIndex++
+			if strings.Contains(s, cfg.VideoExt) || lineIndex >= len(lines) {
+				break
+			} else {
+				b.WriteString("\n")
+			}
 		}
+		line = b.String()
 		ch <- nil
 	})
 	if err != nil {
@@ -83,16 +94,4 @@ func getProcessBar(line *string, ch chan any) *mpb.Bar {
 			decor.OnComplete(decor.Percentage(decor.WC{W: 5}), "done"),
 		),
 	)
-}
-
-func GenerateLineText(fullPath string) (string, error) {
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
-	}
-	rel, err := filepath.Rel(cfg.CoursesDir, fullPath)
-	if err != nil {
-		return "", err
-	}
-	return rel, nil
 }

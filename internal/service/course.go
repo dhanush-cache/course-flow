@@ -63,7 +63,7 @@ func processCodeWithMosh(course db.Courses, zipFiles []string, cfg *config.Confi
 	if err != nil {
 		return err
 	}
-	err = Process(zipFiles, fileNames)
+	err = Process(zipFiles, fileNames, cfg)
 	if err != nil {
 		return err
 	}

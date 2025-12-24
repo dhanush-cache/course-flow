@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	config "github.com/dhanush-cache/course-flow/internal"
 	"github.com/facette/natsort"
 )
 
@@ -69,7 +70,7 @@ func CountVideos(source string) (int, error) {
 	return count, nil
 }
 
-func ProcessVideos(source string, targets []string, fn ProgressCallback) error {
+func ProcessVideos(source string, targets []string, cfg *config.Config, fn ProgressCallback) error {
 	paths, err := readDirNatSort(source)
 	if err != nil {
 		return err
@@ -78,7 +79,8 @@ func ProcessVideos(source string, targets []string, fn ProgressCallback) error {
 		return fmt.Errorf("expected %d targets, got %d", len(paths), len(targets))
 	}
 	for i := range len(targets) {
-		err := FFprocess(paths[i], targets[i], AdvancedOpts{10, ""})
+		dest := fmt.Sprintf("%s/%s", cfg.CoursesDir, targets[i])
+		err := FFprocess(paths[i], dest, AdvancedOpts{10, ""})
 		if err != nil {
 			fmt.Printf("failed to process %s: %v\n", paths[i], err)
 		}

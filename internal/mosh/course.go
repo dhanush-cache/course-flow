@@ -168,8 +168,7 @@ func doGetFileNames(course *Course, parent *ParentInfo, cfg *config.Config) ([]s
 				continue
 			}
 			path := fmt.Sprintf(
-				"%s/%s/%02d - %s/%02d - %s%s",
-				cfg.CoursesDir,
+				"%s/%02d - %s/%02d - %s%s",
 				name,
 				s+1,
 				section.Name,
