@@ -71,8 +71,6 @@ func cacheResult[T any](
 		var cached T
 		if err := json.Unmarshal(data, &cached); err == nil {
 			if isValid == nil || isValid(&cached) {
-				// TODO: remove this debugging statement
-				fmt.Println("CourseCache hit:", cacheFile)
 				return &cached, nil
 			}
 		}

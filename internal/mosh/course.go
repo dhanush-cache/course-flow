@@ -27,7 +27,6 @@ func GetData(slug string, cfg *config.Config) (*Course, error) {
 		Timeout: 10 * time.Second,
 	}
 
-	fmt.Printf("Making GET request to: %s\n", url)
 	resp, err := client.Get(url)
 	if err != nil {
 		fmt.Printf("Error making request: %v\n", err)
@@ -94,7 +93,6 @@ func GetCourses(cfg *config.Config) (*[]Course, error) {
 		Timeout: 10 * time.Second,
 	}
 
-	fmt.Printf("Making GET request to: %s\n", url)
 	resp, err := client.Get(url)
 	if err != nil {
 		fmt.Printf("Error making request: %v\n", err)
