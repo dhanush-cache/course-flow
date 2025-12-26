@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewsCommand(cfg *config.Config) *cobra.Command {
+func NewCommand(cfg *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "course",
 		Short: "Commands for working with the collection of courses",

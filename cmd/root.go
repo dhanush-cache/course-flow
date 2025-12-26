@@ -28,7 +28,7 @@ func NewRootCommand() *cobra.Command {
 Use 'course-flow [command] --help' for more information about a specific command.`,
 	}
 
-	rootCmd.AddCommand(course.NewsCommand(cfg))
+	rootCmd.AddCommand(course.NewCommand(cfg))
 
 	return rootCmd
 }
