@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 
+	configCmd "github.com/dhanush-cache/course-flow/cmd/config"
 	"github.com/dhanush-cache/course-flow/cmd/course"
 	config "github.com/dhanush-cache/course-flow/internal"
 	"github.com/spf13/cobra"
@@ -29,6 +30,7 @@ Use 'course-flow [command] --help' for more information about a specific command
 	}
 
 	rootCmd.AddCommand(course.NewCommand(cfg))
+	rootCmd.AddCommand(configCmd.NewCommand(cfg))
 
 	return rootCmd
 }

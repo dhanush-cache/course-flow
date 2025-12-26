@@ -276,6 +276,59 @@ func (q *Queries) ListCourses(ctx context.Context) ([]Courses, error) {
 	return items, nil
 }
 
+const listCoursesWithPlatforms = `-- name: ListCoursesWithPlatforms :many
+SELECT
+    c.id,
+    c.slug,
+    c.timestamp_id,
+    c.platform_id,
+    p.title AS platform_title,
+    p.url   AS platform_url
+FROM courses AS c
+JOIN platforms AS p
+  ON p.id = c.platform_id
+ORDER BY c.id
+`
+
+type ListCoursesWithPlatformsRow struct {
+	ID            string `json:"id"`
+	Slug          string `json:"slug"`
+	TimestampID   int64  `json:"timestamp_id"`
+	PlatformID    string `json:"platform_id"`
+	PlatformTitle string `json:"platform_title"`
+	PlatformUrl   string `json:"platform_url"`
+}
+
+func (q *Queries) ListCoursesWithPlatforms(ctx context.Context) ([]ListCoursesWithPlatformsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listCoursesWithPlatforms)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListCoursesWithPlatformsRow
+	for rows.Next() {
+		var i ListCoursesWithPlatformsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Slug,
+			&i.TimestampID,
+			&i.PlatformID,
+			&i.PlatformTitle,
+			&i.PlatformUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listPlatforms = `-- name: ListPlatforms :many
 SELECT id, title, url
 FROM platforms

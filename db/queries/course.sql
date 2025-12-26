@@ -83,6 +83,19 @@ SELECT id, title, url
 FROM platforms
 ORDER BY title;
 
+-- name: ListCoursesWithPlatforms :many
+SELECT
+    c.id,
+    c.slug,
+    c.timestamp_id,
+    c.platform_id,
+    p.title AS platform_title,
+    p.url   AS platform_url
+FROM courses AS c
+JOIN platforms AS p
+  ON p.id = c.platform_id
+ORDER BY c.id;
+
 -- name: UpdatePlatform :one
 UPDATE platforms
 SET title = ?,

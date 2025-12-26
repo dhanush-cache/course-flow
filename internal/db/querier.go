@@ -22,6 +22,7 @@ type Querier interface {
 	GetPlatform(ctx context.Context, id string) (Platforms, error)
 	GetTimestamp(ctx context.Context, id int64) (Timestamps, error)
 	ListCourses(ctx context.Context) ([]Courses, error)
+	ListCoursesWithPlatforms(ctx context.Context) ([]ListCoursesWithPlatformsRow, error)
 	ListPlatforms(ctx context.Context) ([]Platforms, error)
 	UpdateCourse(ctx context.Context, arg UpdateCourseParams) (Courses, error)
 	UpdateCourseURL(ctx context.Context, arg UpdateCourseURLParams) error
