@@ -67,13 +67,11 @@ func GetData(slug string, cfg *config.Config) (*Course, error) {
 		}
 		for _, c := range *courses {
 			if _, exists := idMap[c.ID]; exists {
-				fmt.Println(c.Name)
 				childCourse, err := CourseCache(GetData, cfg)(c.Slug, cfg)
 				if err != nil {
 					return nil, err
 				}
 				course.Courses = append(course.Courses, childCourse)
-				fmt.Println(course.Courses)
 			}
 		}
 	}
