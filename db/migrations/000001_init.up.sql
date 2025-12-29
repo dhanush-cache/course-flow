@@ -28,7 +28,7 @@ CREATE TABLE course_urls
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
     course_id TEXT                                       NOT NULL,
     url       TEXT                                       NOT NULL,
-    category  TEXT CHECK (category IN ('url', 'magnet')) NOT NULL,
+    category  TEXT CHECK (category IN ('url', 'gdrive', 'magnet')) NOT NULL,
     position  INTEGER                                    NOT NULL,
     FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE,
     UNIQUE (course_id, position)

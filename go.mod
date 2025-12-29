@@ -7,6 +7,7 @@ require (
 	github.com/facette/natsort v0.0.0-20181210072756-2cd4dd1e2dcb
 	github.com/fatih/color v1.18.0
 	github.com/joho/godotenv v1.5.1
+	github.com/manifoldco/promptui v0.9.0
 	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
@@ -17,6 +18,7 @@ require (
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect

@@ -11,6 +11,7 @@ import (
 	configCmd "github.com/dhanush-cache/course-flow/cmd/config"
 	"github.com/dhanush-cache/course-flow/cmd/course"
 	config "github.com/dhanush-cache/course-flow/internal"
+	"github.com/dhanush-cache/course-flow/internal/service"
 	"github.com/spf13/cobra"
 )
 
@@ -27,6 +28,9 @@ func NewRootCommand() *cobra.Command {
 		Short: "A powerful CLI to manage and organize your educational courses.",
 		Long: `Course-Flow is a command-line interface (CLI) tool designed to help you efficiently manage your collection of educational courses, whether they are from online platforms, universities, or local resources.
 Use 'course-flow [command] --help' for more information about a specific command.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			_ = service.ProcessInteractive(cfg)
+		},
 	}
 
 	rootCmd.AddCommand(course.NewCommand(cfg))
