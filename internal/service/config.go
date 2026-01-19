@@ -32,15 +32,22 @@ func GetCoursesWithPlatform(
 	result := make([]CourseWithPlatform, 0, len(rows))
 
 	for _, r := range rows {
-		course, err := mosh.CourseCache(mosh.GetData, cfg)(r.Slug, cfg)
-		if err != nil {
-			return nil, err
+		var name string
+		if r.PlatformID == config.CodeWithMosh {
+			course, err := mosh.CourseCache(mosh.GetData, cfg)(r.Slug, cfg)
+			if err != nil {
+				return nil, err
+			}
+			name = course.Name
+		} else if r.PlatformID == config.DreamsOfCode {
+			name = r.Slug
+			fmt.Println(name)
 		}
 
 		result = append(result, CourseWithPlatform{
 			ID:            r.ID,
 			Slug:          r.Slug,
-			Name:          course.Name,
+			Name:          name,
 			PlatformTitle: r.PlatformTitle,
 		})
 	}

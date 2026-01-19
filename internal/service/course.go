@@ -5,9 +5,11 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	config "github.com/dhanush-cache/course-flow/internal"
 	"github.com/dhanush-cache/course-flow/internal/db"
+	"github.com/dhanush-cache/course-flow/internal/platforms/dreamsofcode"
 	"github.com/dhanush-cache/course-flow/internal/platforms/mosh"
 )
 
@@ -27,6 +29,8 @@ func AddCourse(key string, zipFiles []string, cfg *config.Config) error {
 	// TODO: Implement the url logic
 	if course.PlatformID == config.CodeWithMosh {
 		err = processCodeWithMosh(course, zipFiles, cfg)
+	} else if course.PlatformID == config.DreamsOfCode {
+		err = processDreamsOfCode(course, zipFiles, cfg)
 	}
 	if err != nil {
 		return err
@@ -60,6 +64,24 @@ func processCodeWithMosh(course db.Courses, zipFiles []string, cfg *config.Confi
 		return err
 	}
 	fileNames, err := mosh.GetFileNames(data, cfg)
+	if err != nil {
+		return err
+	}
+	err = Process(zipFiles, fileNames, cfg)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func processDreamsOfCode(course db.Courses, zipFiles []string, cfg *config.Config) error {
+	cacheFile := filepath.Join(cfg.CacheDir, course.Slug+".json")
+	fmt.Println(cacheFile)
+	data, err := dreamsofcode.LoadCourse(cacheFile)
+	if err != nil {
+		return err
+	}
+	fileNames, err := dreamsofcode.GetFileNames(data, cfg)
 	if err != nil {
 		return err
 	}

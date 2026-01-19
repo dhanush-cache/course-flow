@@ -11,6 +11,7 @@ import (
 
 const (
 	CodeWithMosh = "codewithmosh"
+	DreamsOfCode = "dreamsofcode"
 )
 
 type Config struct {
