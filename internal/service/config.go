@@ -9,7 +9,7 @@ import (
 
 	config "github.com/dhanush-cache/course-flow/internal"
 	"github.com/dhanush-cache/course-flow/internal/db"
-	"github.com/dhanush-cache/course-flow/internal/mosh"
+	"github.com/dhanush-cache/course-flow/internal/platforms/mosh"
 )
 
 type CourseWithPlatform struct {
