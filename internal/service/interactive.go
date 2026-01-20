@@ -81,8 +81,7 @@ func ProcessInteractive(cfg *config.Config) error {
 			}
 		}
 	}
-
-	err = AddCourse(course.ID, zips, cfg)
+	err = AddCourse(Options{CourseID: course.ID, ZipFiles: zips}, cfg)
 	if err != nil {
 		fmt.Println(err)
 		return err

@@ -23,11 +23,7 @@ var (
 
 // TODO: Understand the bars better and refactor the code to make it cleaner.
 
-func Process(zipFiles []string, targets []string, cfg *config.Config) error {
-	var line string
-	lines := utils.BuildTree(targets)
-	lineIndex := 0
-
+func ExtractAndProcess(zipFiles []string, targets []string, cfg *config.Config) error {
 	tempDir, err := os.MkdirTemp("", "zip-extract-*")
 	if err != nil {
 		return err
@@ -38,21 +34,23 @@ func Process(zipFiles []string, targets []string, cfg *config.Config) error {
 		}
 	}()
 
-	for _, zip := range zipFiles {
-		extractBar := getExtractBar()
-		err = utils.Unzip(zip, tempDir, func(done, total int, _ string) {
-			extractBar.SetTotal(int64(total), total == done)
-			extractBar.SetCurrent(int64(done))
-		})
-		if err != nil {
-			return err
-		}
+	err = Extract(zipFiles, tempDir)
+	if err != nil {
+		return err
 	}
+
+	return Process(tempDir, targets, cfg)
+}
+
+func Process(source string, targets []string, cfg *config.Config) error {
+	var line string
+	lines := utils.BuildTree(targets)
+	lineIndex := 0
 
 	ch := make(chan any)
 	processBar := getProcessBar(&line, ch)
 
-	err = utils.ProcessVideos(tempDir, targets, cfg, func(done, total int, current string) {
+	err := utils.ProcessVideos(source, targets, cfg, func(done, total int, current string) {
 		processBar.SetTotal(int64(total), total == done)
 		processBar.SetCurrent(int64(done))
 		var b strings.Builder
@@ -71,6 +69,20 @@ func Process(zipFiles []string, targets []string, cfg *config.Config) error {
 	})
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func Extract(zipFiles []string, tempDir string) error {
+	for _, zip := range zipFiles {
+		extractBar := getExtractBar()
+		err := utils.Unzip(zip, tempDir, func(done, total int, _ string) {
+			extractBar.SetTotal(int64(total), total == done)
+			extractBar.SetCurrent(int64(done))
+		})
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
