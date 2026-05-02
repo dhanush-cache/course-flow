@@ -2,10 +2,11 @@ import json
 from pathlib import Path
 import sqlite3
 
-source = "data.json"
-dest = "db.sqlite"
+base_path = Path(__file__).resolve().parent.parent
+source = base_path / "scripts" / "data.json"
+dest = base_path / "db.sqlite"
 
-data = json.loads(Path(source).read_text())
+data = json.loads(source.read_text())
 templates = data["templates"]
 configs = data["configs"]
 
