@@ -43,9 +43,9 @@ func AddCourse(options Options, cfg *config.Config) error {
 		return err
 	}
 	if options.ZipFiles != nil {
-		err = ExtractAndProcess(options.ZipFiles, fileNames, cfg)
+		err = ExtractAndProcess(course.ID, options.ZipFiles, fileNames, cfg)
 	} else if options.Directory != "" {
-		err = Process(options.Directory, fileNames, cfg)
+		err = Process(course.ID, options.Directory, fileNames, cfg)
 	}
 
 	return err

@@ -7,6 +7,7 @@ import (
 
 	config "github.com/dhanush-cache/course-flow/internal"
 	"github.com/dhanush-cache/course-flow/internal/adapters"
+	"github.com/dhanush-cache/course-flow/internal/hooks"
 	"github.com/dhanush-cache/course-flow/internal/utils"
 	"github.com/fatih/color"
 	"github.com/vbauerster/mpb/v8"
@@ -23,7 +24,7 @@ var (
 
 // TODO: Understand the bars better and refactor the code to make it cleaner.
 
-func ExtractAndProcess(zipFiles []string, targets []string, cfg *config.Config) error {
+func ExtractAndProcess(courseID string, zipFiles []string, targets []string, cfg *config.Config) error {
 	tempDir, err := os.MkdirTemp(cfg.CacheDir, "zip-extract-*")
 	if err != nil {
 		return err
@@ -39,10 +40,14 @@ func ExtractAndProcess(zipFiles []string, targets []string, cfg *config.Config) 
 		return err
 	}
 
-	return Process(tempDir, targets, cfg)
+	return Process(courseID, tempDir, targets, cfg)
 }
 
-func Process(source string, targets []string, cfg *config.Config) error {
+func Process(courseID string, source string, targets []string, cfg *config.Config) error {
+	if err := hooks.Run(courseID, source); err != nil {
+		return err
+	}
+
 	var line string
 	lines := utils.BuildTree(targets)
 	lineIndex := 0
@@ -100,6 +105,7 @@ func getExtractBar() *mpb.Bar {
 		),
 	)
 }
+
 func getProcessBar(line *string, ch chan any) *mpb.Bar {
 	p := mpb.New(mpb.WithManualRefresh(ch))
 
