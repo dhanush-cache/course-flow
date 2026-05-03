@@ -14,18 +14,21 @@ Course-Flow is a command-line interface (CLI) tool designed to help you efficien
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone <repository-url>
    cd course-flow
    ```
 
 2. **Install Go dependencies:**
+
    ```bash
    go mod download
    ```
 
 3. **Apply Database Migrations:**
    Ensure you have `migrate` installed and run:
+
    ```bash
    migrate -path db/migrations -database "sqlite3://db.sqlite" up
    ```
@@ -39,6 +42,7 @@ Course-Flow is a command-line interface (CLI) tool designed to help you efficien
 ### Usage
 
 Run the application:
+
 ```bash
 go run main.go
 ```
