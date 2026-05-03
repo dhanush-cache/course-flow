@@ -15,8 +15,8 @@ func NewListCommand(cfg *config.Config) *cobra.Command {
 		Use:     "list",
 		Short:   "Command to list available configs",
 		Aliases: []string{"ls"},
-		Run: func(cmd *cobra.Command, args []string) {
-			_ = service.ListConfigs(cfg)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return service.ListConfigs(cfg)
 		},
 	}
 }
