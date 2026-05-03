@@ -36,12 +36,13 @@ func GetCoursesWithPlatform(
 		if r.PlatformID == config.CodeWithMosh {
 			course, err := mosh.CourseCache(mosh.GetData, cfg)(r.Slug, cfg)
 			if err != nil {
-				return nil, err
+				fmt.Fprintf(os.Stderr, "Warning: failed to fetch data for %s: %v\n", r.Slug, err)
+				name = r.Slug
+			} else {
+				name = course.Name
 			}
-			name = course.Name
 		} else if r.PlatformID == config.DreamsOfCode {
 			name = r.Slug
-			fmt.Println(name)
 		}
 
 		result = append(result, CourseWithPlatform{
