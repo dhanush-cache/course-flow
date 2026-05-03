@@ -24,7 +24,7 @@ var (
 // TODO: Understand the bars better and refactor the code to make it cleaner.
 
 func ExtractAndProcess(zipFiles []string, targets []string, cfg *config.Config) error {
-	tempDir, err := os.MkdirTemp("", "zip-extract-*")
+	tempDir, err := os.MkdirTemp(cfg.CacheDir, "zip-extract-*")
 	if err != nil {
 		return err
 	}

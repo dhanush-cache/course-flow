@@ -66,7 +66,7 @@ func ProcessInteractive(cfg *config.Config) error {
 			}
 		}
 
-		tempDir, err := os.MkdirTemp("", "course-flow-")
+		tempDir, err := os.MkdirTemp(cfg.CacheDir, "course-flow-")
 		if err != nil {
 			return err
 		}

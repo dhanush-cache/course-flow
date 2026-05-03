@@ -114,16 +114,16 @@ func moveFile(source, dest string) error {
 		return err
 	}
 
-	if strings.HasPrefix(source, "/tmp/") {
+	err = os.Rename(source, dest)
+	if err != nil {
 		_, err = CopyFile(source, dest)
-		if err := os.Remove(source); err != nil {
+		if err != nil {
 			return err
 		}
-	} else {
-		err = os.Rename(source, dest)
+		return os.Remove(source)
 	}
 
-	return err
+	return nil
 }
 
 func readDirNatSort(source string) ([]string, error) {
