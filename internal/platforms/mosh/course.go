@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dhanush-cache/course-flow/internal"
+	config "github.com/dhanush-cache/course-flow/internal"
 	"github.com/dhanush-cache/course-flow/internal/utils"
 )
 
@@ -115,6 +115,7 @@ func doGetFileNames(course *Course, parent *ParentInfo, cfg *config.Config) ([]s
 func removeBuzzWords(name string) string {
 	buzzWords := []string{
 		"Mastering",
+		"for Professional Developers",
 		"Mastery",
 		"The Ultimate",
 		"Ultimate",
