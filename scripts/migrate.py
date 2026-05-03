@@ -4,7 +4,8 @@ import sqlite3
 
 base_path = Path(__file__).resolve().parent.parent
 source = base_path / "scripts" / "data.json"
-dest = base_path / "db.sqlite"
+dest = Path.home() / ".local" / "share" / "course-flow" / "db.sqlite"
+dest.parent.mkdir(parents=True, exist_ok=True)
 
 data = json.loads(source.read_text())
 templates = data["templates"]

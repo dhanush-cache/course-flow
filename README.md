@@ -30,7 +30,7 @@ Course-Flow is a command-line interface (CLI) tool designed to help you efficien
    Ensure you have `migrate` installed and run:
 
    ```bash
-   migrate -path db/migrations -database "sqlite3://db.sqlite" up
+   migrate -path db/migrations -database "sqlite3://$HOME/.local/share/course-flow/db.sqlite" up
    ```
 
 4. **Populate Database (Optional):**
