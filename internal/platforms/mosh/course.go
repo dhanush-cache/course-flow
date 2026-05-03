@@ -1,12 +1,8 @@
 package mosh
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"strings"
-	"time"
 
 	"github.com/dhanush-cache/course-flow/internal"
 	"github.com/dhanush-cache/course-flow/internal/utils"
@@ -16,46 +12,15 @@ import (
 
 // GetData fetches course data for the given slug.
 func GetData(slug string, cfg *config.Config) (*Course, error) {
-	token, err := TokenCache(GetToken, "token", cfg)()
+	url := fmt.Sprintf("https://codewithmosh.com/p/%s", slug)
+
+	var response CourseResponse
+	err := ScrapePage(url, &response)
 	if err != nil {
-		return nil, fmt.Errorf("error getting token: %v", err)
-	}
-
-	url := fmt.Sprintf("https://codewithmosh.com/_next/data/%s/p/%s.json", token.Value, slug)
-
-	client := http.Client{
-		Timeout: 10 * time.Second,
-	}
-
-	resp, err := client.Get(url)
-	if err != nil {
-		fmt.Printf("Error making request: %v\n", err)
 		return nil, err
 	}
 
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Printf("error closing response body: %v\n", err)
-		}
-	}(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("request failed with status code: %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v", err)
-	}
-
-	var response CourseResponse
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
-	}
-	course := &response.PageProps.Course
+	course := &response.Props.PageProps.Course
 	if course.Type == "bundle" {
 		idMap := make(map[int]struct{})
 		for _, id := range course.BundleContents {
@@ -80,47 +45,15 @@ func GetData(slug string, cfg *config.Config) (*Course, error) {
 
 // GetCourses fetches the list of all courses.
 func GetCourses(cfg *config.Config) (*[]Course, error) {
-	token, err := TokenCache(GetToken, "token", cfg)()
+	url := "https://codewithmosh.com/courses"
+
+	var response CoursesResponse
+	err := ScrapePage(url, &response)
 	if err != nil {
-		return nil, fmt.Errorf("error getting token: %v", err)
-	}
-
-	url := fmt.Sprintf("https://codewithmosh.com/_next/data/%s/courses.json", token.Value)
-
-	client := http.Client{
-		Timeout: 10 * time.Second,
-	}
-
-	resp, err := client.Get(url)
-	if err != nil {
-		fmt.Printf("Error making request: %v\n", err)
 		return nil, err
 	}
 
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			fmt.Printf("error closing response body: %v\n", err)
-		}
-	}(resp.Body)
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("request failed with status code: %d", resp.StatusCode)
-	}
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v", err)
-	}
-
-	var response CoursesResponse
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
-	}
-
-	return &response.PageProps.Courses, nil
+	return &response.Props.PageProps.Courses, nil
 }
 
 type ParentInfo struct {

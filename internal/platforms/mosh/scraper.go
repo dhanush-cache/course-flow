@@ -5,18 +5,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-// GetToken fetches the buildId token from the codewithmosh website.
-func GetToken() (*Token, error) {
-	url := "https://codewithmosh.com/"
-
+// ScrapePage fetches the given URL and extracts the __NEXT_DATA__ JSON.
+func ScrapePage(url string, target any) error {
 	res, err := http.Get(url)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -26,27 +23,24 @@ func GetToken() (*Token, error) {
 	}(res.Body)
 
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
+		return fmt.Errorf("status code error: %d %s for URL: %s", res.StatusCode, res.Status, url)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	selection := doc.Find("#__NEXT_DATA__").First()
-	jsonData := []byte(selection.Text())
-	var obj map[string]any
-	if err := json.Unmarshal(jsonData, &obj); err != nil {
-		return nil, err
+	if selection.Length() == 0 {
+		return fmt.Errorf("__NEXT_DATA__ not found")
 	}
 
-	token, ok := obj["buildId"].(string)
-	if !ok {
-		return nil, fmt.Errorf("buildId not found or not a string")
+	content := selection.Text()
+	jsonData := []byte(content)
+	if err := json.Unmarshal(jsonData, target); err != nil {
+		return fmt.Errorf("error unmarshalling JSON: %v", err)
 	}
-	return &Token{
-		Value:     token,
-		ExpiresAt: time.Now().AddDate(0, 0, 1),
-	}, nil
+
+	return nil
 }

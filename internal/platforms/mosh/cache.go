@@ -5,30 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	config "github.com/dhanush-cache/course-flow/internal"
 )
 
-type TokenFetchFunc func() (*Token, error)
-
 type CourseFetchFunc func(slug string, cfg *config.Config) (*Course, error)
 
 type CoursesFetchFunc func(cfg *config.Config) (*[]Course, error)
-
-// TokenCache caches the result of a TokenFetchFunc based on the provided key.
-func TokenCache(fn TokenFetchFunc, key string, cfg *config.Config) TokenFetchFunc {
-	return func() (*Token, error) {
-		return cacheResult(
-			key,
-			fn,
-			func(t *Token) bool {
-				return t.ExpiresAt.After(time.Now())
-			},
-			cfg,
-		)
-	}
-}
 
 // CourseCache caches the result of a CourseFetchFunc based on the course slug.
 func CourseCache(fn CourseFetchFunc, cfg *config.Config) CourseFetchFunc {

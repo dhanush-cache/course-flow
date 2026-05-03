@@ -1,11 +1,18 @@
 package mosh
 
-import "time"
-
 type CourseResponse struct {
+	Props CourseProps `json:"props"`
+}
+
+type CourseProps struct {
 	PageProps CoursePageProps `json:"pageProps"`
 }
+
 type CoursesResponse struct {
+	Props CoursesProps `json:"props"`
+}
+
+type CoursesProps struct {
 	PageProps CoursesPageProps `json:"pageProps"`
 }
 
@@ -34,9 +41,4 @@ type Section struct {
 type Lesson struct {
 	Name    string `json:"name"`
 	IsVideo int    `json:"type"`
-}
-
-type Token struct {
-	Value     string    `json:"value"`
-	ExpiresAt time.Time `json:"expires_at"`
 }
