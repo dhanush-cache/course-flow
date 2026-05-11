@@ -10,6 +10,7 @@ var Registry = map[string]HookFunc{}
 
 func init() {
 	Registry["sql"] = SQL
+	Registry["node"] = Node
 }
 
 func Run(courseID string, folderPath string) error {
